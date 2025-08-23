@@ -4,7 +4,7 @@ import SwiftUI
 class ProjectsViewModel: ObservableObject {
 
     @Published var selectedFolderURL: URL?
-    @Published var subfolders: [String] = []
+    @Published var subfolders: [URL] = []
 
     var projectsModel: ProjectsModel
 

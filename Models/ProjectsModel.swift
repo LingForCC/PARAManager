@@ -8,7 +8,7 @@ extension Notification.Name {
 class ProjectsModel {
 
     private var selectedFolderURL: URL?
-    private var subfolders: [String] = []
+    private var subfolders: [URL] = []
     
     private var fileWatcher: FileWatcher?
     
@@ -53,7 +53,7 @@ class ProjectsModel {
         self.fileWatcher = nil
     }
     
-    func getSubfolders() -> [String] {
+    func getSubfolders() -> [URL] {
         return subfolders
     }
     
@@ -64,17 +64,17 @@ class ProjectsModel {
     private func loadSubfolders(from url: URL) throws {
         do {
             let directoryContents = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: [.isDirectoryKey], options: [])
-            let newSubfolders = directoryContents.compactMap { itemURL -> String? in
+            let newSubfolders = directoryContents.compactMap { itemURL -> URL? in
                 do {
                     let resourceValues = try itemURL.resourceValues(forKeys: [.isDirectoryKey])
                     if resourceValues.isDirectory == true {
-                        return itemURL.lastPathComponent
+                        return itemURL
                     }
                 } catch {
                     print("Error checking if item is directory: \(itemURL.path), error: \(error)")
                 }
                 return nil
-            }.sorted()
+            }.sorted { $0.lastPathComponent < $1.lastPathComponent }
             
             self.subfolders = newSubfolders
         } catch {

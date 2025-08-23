@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 struct ProjectsView: View {
 
@@ -33,7 +34,13 @@ struct ProjectsView: View {
                         .foregroundColor(.gray)
                 } else {
                     List(projectsViewModel.subfolders, id: \.self) { subfolder in
-                        Text(subfolder)
+                        HStack {
+                            Text(subfolder.lastPathComponent)
+                            Spacer()
+                            Button("Open in Finder") {
+                                NSWorkspace.shared.open(subfolder)
+                            }
+                        }
                     }
                     .frame(minHeight: 150) // Give the list some default height
                 }
