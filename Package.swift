@@ -18,13 +18,7 @@ let package = Package(
         .executableTarget(
             name: "PARAManager",
             dependencies: [],
-            path: ".",
-            sources: [
-                "PARAManagerApp.swift",
-                "ContentModel.swift",
-                "ContentViewModel.swift",
-                "ContentView.swift"
-            ]
+            path: "."
         ),
     ]
 )
