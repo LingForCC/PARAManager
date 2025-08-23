@@ -10,9 +10,23 @@ class ContentViewModel: ObservableObject {
 
     init() {
         self.contentModel = AppContext.shared.contentModel
+        setupNotificationObserver()
+    }
+    
+    private func setupNotificationObserver() {
+        NotificationCenter.default.addObserver(
+            forName: .subfoldersUpdated,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handleSubfoldersUpdated()
+        }
+    }
+    
+    private func handleSubfoldersUpdated() {
+        self.subfolders = contentModel.getSubfolders()
     }
 
-    // This method will be called by the ViewModel
     func selectFolder() {
         let openPanel = NSOpenPanel()
         openPanel.allowsMultipleSelection = false
@@ -22,7 +36,6 @@ class ContentViewModel: ObservableObject {
         openPanel.prompt = "Select Folder"
         openPanel.title = "Choose a folder to monitor"
 
-        // NSOpenPanel's runModal must be called on the main thread.
         DispatchQueue.main.async {
             if openPanel.runModal() == .OK {
                 guard let selectedURL = openPanel.url else { return }

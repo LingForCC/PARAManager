@@ -1,6 +1,10 @@
 import Foundation
 import AppKit // Needed for NSOpenPanel if we decide to call it here, or for URL handling.
 
+extension Notification.Name {
+    static let subfoldersUpdated = Notification.Name("subfoldersUpdated")
+}
+
 class ContentModel {
 
     private var selectedFolderURL: URL?
@@ -22,10 +26,10 @@ class ContentModel {
 
     private func startWatching(url: URL) {
         self.fileWatcher = FileWatcher(url: url) { [weak self] in
-            print("File system change detected in \(url.path)")
             do {
                 try self?.loadSubfolders(from: url)
 
+                NotificationCenter.default.post(name: .subfoldersUpdated, object: nil)
             } catch {
                 //do nothing
             }
@@ -35,6 +39,10 @@ class ContentModel {
     private func stopWatchingCurrentFolder() {
         self.fileWatcher?.stopWatching()
         self.fileWatcher = nil
+    }
+    
+    func getSubfolders() -> [String] {
+        return subfolders
     }
 
     private func loadSubfolders(from url: URL) throws {
