@@ -12,7 +12,21 @@ class ProjectsModel {
     
     private var fileWatcher: FileWatcher?
     
-    func selectFolderURL(url: URL) throws -> [String] {
+    private let selectedFolderURLKey = "SelectedFolderURL"
+    
+    init() {
+        loadSelectedFolderFromUserDefaults()
+    }
+    
+    func selectFolderURL(url: URL) throws {
+
+        try selectFolder(url: url)
+        
+        saveSelectedFolderToUserDefaults()
+
+    }
+
+    private func selectFolder(url: URL) throws {
 
         self.stopWatchingCurrentFolder()
                 
@@ -20,8 +34,6 @@ class ProjectsModel {
         self.selectedFolderURL = url
 
         self.startWatching(url: url)
-
-        return subfolders
     }
 
     private func startWatching(url: URL) {
@@ -43,6 +55,10 @@ class ProjectsModel {
     
     func getSubfolders() -> [String] {
         return subfolders
+    }
+    
+    func getSelectedFolderURL() -> URL? {
+        return selectedFolderURL
     }
 
     private func loadSubfolders(from url: URL) throws {
@@ -66,6 +82,33 @@ class ProjectsModel {
             self.subfolders = [] // Clear subfolders on error
             throw error
         }
+    }
+    
+    private func loadSelectedFolderFromUserDefaults() {
+        guard let urlString = UserDefaults.standard.string(forKey: selectedFolderURLKey),
+              let url = URL(string: urlString) else {
+            return
+        }
         
+        if FileManager.default.fileExists(atPath: url.path) {
+            do {
+                try selectFolder(url: url)
+            } catch {
+                print("Error loading saved folder: \(error.localizedDescription)")
+                // Remove the invalid URL from UserDefaults
+                UserDefaults.standard.removeObject(forKey: selectedFolderURLKey)
+            }
+        } else {
+            UserDefaults.standard.removeObject(forKey: selectedFolderURLKey)
+        }
+    }
+    
+    private func saveSelectedFolderToUserDefaults() {
+        guard let url = selectedFolderURL else {
+            UserDefaults.standard.removeObject(forKey: selectedFolderURLKey)
+            return
+        }
+       
+        UserDefaults.standard.set(url.absoluteString, forKey: selectedFolderURLKey)
     }
 }

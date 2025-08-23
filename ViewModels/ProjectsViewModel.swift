@@ -11,6 +11,15 @@ class ProjectsViewModel: ObservableObject {
     init() {
         self.projectsModel = AppContext.shared.projectsModel
         setupNotificationObserver()
+        syncWithModel()
+    }
+    
+    private func syncWithModel() {
+        // Get the current subfolders from the model
+        self.subfolders = projectsModel.getSubfolders()
+        
+        // Get the selected folder URL from the model
+        self.selectedFolderURL = projectsModel.getSelectedFolderURL()
     }
     
     private func setupNotificationObserver() {
@@ -41,8 +50,9 @@ class ProjectsViewModel: ObservableObject {
                 guard let selectedURL = openPanel.url else { return }
                 
                 do {
-                    self.subfolders = try self.projectsModel.selectFolderURL(url: selectedURL)
-                    self.selectedFolderURL = selectedURL
+                    try self.projectsModel.selectFolderURL(url: selectedURL)
+                    self.selectedFolderURL = self.projectsModel.getSelectedFolderURL()
+                    self.subfolders = self.projectsModel.getSubfolders()
                 } catch {
                     //Do nothing for now. Probabaly need to display error messages in the UI
                     print("Error selecting folder: \(error)")
