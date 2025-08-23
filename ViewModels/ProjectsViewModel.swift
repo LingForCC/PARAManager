@@ -45,7 +45,17 @@ class ProjectsViewModel: ObservableObject {
                     self.selectedFolderURL = selectedURL
                 } catch {
                     //Do nothing for now. Probabaly need to display error messages in the UI
-
+                    print("Error selecting folder: \(error)")
+                }
+                
+                // Ensure main window regains focus after NSOpenPanel closes
+                DispatchQueue.main.async {
+                    NSApplication.shared.activate(ignoringOtherApps: true)
+                }
+            } else {
+                // User cancelled, still ensure main window regains focus
+                DispatchQueue.main.async {
+                    NSApplication.shared.activate(ignoringOtherApps: true)
                 }
             }
         }
