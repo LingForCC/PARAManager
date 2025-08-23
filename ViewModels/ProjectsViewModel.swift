@@ -4,6 +4,7 @@ import SwiftUI
 class ProjectsViewModel: ObservableObject {
 
     @Published var selectedFolderURL: URL?
+    @Published var archivingFolderURL: URL?
     @Published var subfolders: [URL] = []
 
     var projectsModel: ProjectsModel
@@ -20,6 +21,9 @@ class ProjectsViewModel: ObservableObject {
         
         // Get the selected folder URL from the model
         self.selectedFolderURL = projectsModel.getSelectedFolderURL()
+        
+        // Get the archiving folder URL from the model
+        self.archivingFolderURL = projectsModel.getArchivingFolderURL()
     }
     
     private func setupNotificationObserver() {
@@ -68,6 +72,46 @@ class ProjectsViewModel: ObservableObject {
                     NSApplication.shared.activate(ignoringOtherApps: true)
                 }
             }
+        }
+    }
+    
+    // MARK: - Archiving Functionality
+    
+    func selectArchivingFolder() {
+        let openPanel = NSOpenPanel()
+        openPanel.allowsMultipleSelection = false
+        openPanel.canChooseDirectories = true
+        openPanel.canChooseFiles = false
+        openPanel.canCreateDirectories = false
+        openPanel.prompt = "Select Archiving Folder"
+        openPanel.title = "Choose a folder for archiving projects"
+
+        DispatchQueue.main.async {
+            if openPanel.runModal() == .OK {
+                guard let selectedURL = openPanel.url else { return }
+                
+                self.projectsModel.setArchivingFolderURL(url: selectedURL)
+                self.archivingFolderURL = self.projectsModel.getArchivingFolderURL()
+                
+                // Ensure main window regains focus after NSOpenPanel closes
+                DispatchQueue.main.async {
+                    NSApplication.shared.activate(ignoringOtherApps: true)
+                }
+            } else {
+                // User cancelled, still ensure main window regains focus
+                DispatchQueue.main.async {
+                    NSApplication.shared.activate(ignoringOtherApps: true)
+                }
+            }
+        }
+    }
+    
+    func archiveSubfolder(at index: Int) {
+        do {
+            try projectsModel.archiveSubfolder(at: index)
+        } catch {
+            print("Error archiving subfolder: \(error.localizedDescription)")
+            // TODO: Show error to user in UI
         }
     }
 }

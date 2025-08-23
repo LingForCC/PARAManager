@@ -15,39 +15,69 @@ struct ProjectsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
+            HStack {
+                Button("Select Projects Folder") {
+                    projectsViewModel.selectFolder()
+                }
+                .background(Color.green)
+                .foregroundColor(.white)
+                .cornerRadius(10)
 
-            Button("Pick Folder") {
-                projectsViewModel.selectFolder()
+                Button("Select Archiving Folder") {
+                    projectsViewModel.selectArchivingFolder()
+                }
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(10)
             }
-            .padding()
-            .background(Color.green)
-            .foregroundColor(.white)
-            .cornerRadius(10)
 
             if let selectedFolderURL = projectsViewModel.selectedFolderURL {
-                Text("Selected Folder: \(selectedFolderURL.path)")
-                    .font(.headline)
+                Text("Projects Folder: \(selectedFolderURL.path)")
+                    .font(.subheadline)
                     .foregroundColor(.secondary)
-                
-                if projectsViewModel.subfolders.isEmpty {
-                    Text("No subfolders found.")
-                        .foregroundColor(.gray)
-                } else {
-                    List(projectsViewModel.subfolders, id: \.self) { subfolder in
-                        HStack {
-                            Text(subfolder.lastPathComponent)
-                            Spacer()
-                            Button("Open in Finder") {
+            }   else {
+                Text("No projects folder selected.")
+                    .font(.subheadline)
+                    .foregroundColor(.orange)
+            }
+            
+            if let archivingFolderURL = projectsViewModel.archivingFolderURL {
+                Text("Archiving Folder: \(archivingFolderURL.path)")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            } else {
+                Text("No archiving folder selected.")
+                    .font(.subheadline)
+                    .foregroundColor(.orange)
+            }
+            
+            if projectsViewModel.subfolders.isEmpty {
+                Text("No subfolders found.")
+                    .foregroundColor(.gray)
+            } else {
+                List(projectsViewModel.subfolders.indices, id: \.self) { index in
+                    let subfolder = projectsViewModel.subfolders[index]
+                    HStack {
+                        Text(subfolder.lastPathComponent)
+                        Spacer()
+                        HStack(spacing: 8) {
+                            Button("Open") {
                                 NSWorkspace.shared.open(subfolder)
                             }
+                            .buttonStyle(.bordered)
+                            
+                            Button("Archive") {
+                                projectsViewModel.archiveSubfolder(at: index)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.orange)
+                            .disabled(projectsViewModel.archivingFolderURL == nil)
                         }
                     }
-                    .frame(minHeight: 150) // Give the list some default height
                 }
-            } else {
-                Text("No folder selected.")
-                    .foregroundColor(.gray)
+                .frame(minHeight: 150) // Give the list some default height
             }
+
             
             Spacer() // Pushes content to the top
         }
