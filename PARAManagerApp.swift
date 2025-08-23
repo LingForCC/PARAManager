@@ -5,7 +5,7 @@ struct PARAManagerApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ProjectsView()
         }
     }
 }

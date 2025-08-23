@@ -5,7 +5,7 @@ extension Notification.Name {
     static let subfoldersUpdated = Notification.Name("subfoldersUpdated")
 }
 
-class ContentModel {
+class ProjectsModel {
 
     private var selectedFolderURL: URL?
     private var subfolders: [String] = []

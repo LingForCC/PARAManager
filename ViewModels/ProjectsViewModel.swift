@@ -1,15 +1,15 @@
 import Foundation
 import SwiftUI
 
-class ContentViewModel: ObservableObject {
+class ProjectsViewModel: ObservableObject {
 
     @Published var selectedFolderURL: URL?
     @Published var subfolders: [String] = []
 
-    var contentModel: ContentModel
+    var projectsModel: ProjectsModel
 
     init() {
-        self.contentModel = AppContext.shared.contentModel
+        self.projectsModel = AppContext.shared.projectsModel
         setupNotificationObserver()
     }
     
@@ -24,7 +24,7 @@ class ContentViewModel: ObservableObject {
     }
     
     private func handleSubfoldersUpdated() {
-        self.subfolders = contentModel.getSubfolders()
+        self.subfolders = projectsModel.getSubfolders()
     }
 
     func selectFolder() {
@@ -41,7 +41,7 @@ class ContentViewModel: ObservableObject {
                 guard let selectedURL = openPanel.url else { return }
                 
                 do {
-                    self.subfolders = try self.contentModel.selectFolderURL(url: selectedURL)
+                    self.subfolders = try self.projectsModel.selectFolderURL(url: selectedURL)
                     self.selectedFolderURL = selectedURL
                 } catch {
                     //Do nothing for now. Probabaly need to display error messages in the UI

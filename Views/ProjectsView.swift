@@ -1,8 +1,8 @@
 import SwiftUI
 
-struct ContentView: View {
+struct ProjectsView: View {
 
-    @StateObject var contentModel = ContentViewModel()
+    @StateObject var projectsViewModel = ProjectsViewModel()
     
     // We still need the ViewModel to trigger actions, or we can call model methods directly.
     // For this refactoring, let's assume the view might trigger model actions directly
@@ -16,23 +16,23 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 20) {
 
             Button("Pick Folder") {
-                contentModel.selectFolder()
+                projectsViewModel.selectFolder()
             }
             .padding()
             .background(Color.green)
             .foregroundColor(.white)
             .cornerRadius(10)
 
-            if let selectedFolderURL = contentModel.selectedFolderURL {
+            if let selectedFolderURL = projectsViewModel.selectedFolderURL {
                 Text("Selected Folder: \(selectedFolderURL.path)")
                     .font(.headline)
                     .foregroundColor(.secondary)
                 
-                if contentModel.subfolders.isEmpty {
+                if projectsViewModel.subfolders.isEmpty {
                     Text("No subfolders found.")
                         .foregroundColor(.gray)
                 } else {
-                    List(contentModel.subfolders, id: \.self) { subfolder in
+                    List(projectsViewModel.subfolders, id: \.self) { subfolder in
                         Text(subfolder)
                     }
                     .frame(minHeight: 150) // Give the list some default height
